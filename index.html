@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background: #222;
+            display: block;
+        }
+        canvas#gameCanvas {
+            background-color: rgba(71, 67, 70, 0.52);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 1920;
+        canvas.height = 1080;
+
+        canvas.style.backgroundColor = 'rgba(71, 67, 70, 0.52)';
+
+        let gravity = 0.5;
+        let jumpPower = -12;
+        let charge = 0;
+        let maxCharge = 5;
+        let charging = false;
+        const player = {
+            x: 100,
+            y: 400,
+            width: 30,
+            height: 30,
+            dx: 0,
+            dy: 0,
+            onGround: false
+        };
+
+        // Масив платформ і стінок
+        const platforms = [
+            { x: 0, y: 900, width: 18000, height: 100 }, // земля
+            { x: 0, y: 0, width: 50, height: 6000 },     // ліва стінка
+            { x: 300, y: 800, width: 300, height: 300 }, // платформа
+            // Додавайте нові платформи тут за потреби
+        ];
+
+        function drawPlayer() {
+            ctx.fillStyle = 'lime';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawPlatforms() {
+            ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+            for (const p of platforms) {
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+            }
+        }
+
+        const keys = {};
+
+        window.addEventListener('keydown', function(e) {
+            keys[e.code] = true;
+            // Стрибок (пробіл)
+            if ((e.code === 'Space') && player.onGround) {
+                player.dy = jumpPower;
+                player.onGround = false;
+            }
+        });
+
+        window.addEventListener('keyup', function(e) {
+            keys[e.code] = false;
+        });
+
+        function updatePlayer() {
+            // Визначаємо швидкість по X
+            if (keys['ArrowLeft'] || keys['KeyA']) {
+                player.dx = -5;
+            } else if (keys['ArrowRight'] || keys['KeyD']) {
+                player.dx = 5;
+            } else {
+                player.dx = 0;
+            }
+
+            // Горизонтальний рух з перевіркою зіткнень
+            let nextX = player.x + player.dx;
+            let nextY = player.y;
+
+            for (const p of platforms) {
+                // Зіткнення справа
+                if (
+                    player.y + player.height > p.y &&
+                    player.y < p.y + p.height &&
+                    player.x + player.width <= p.x &&
+                    nextX + player.width > p.x
+                ) {
+                    nextX = p.x - player.width;
+                    player.dx = 0;
+                }
+                // Зіткнення зліва
+                if (
+                    player.y + player.height > p.y &&
+                    player.y < p.y + p.height &&
+                    player.x >= p.x + p.width &&
+                    nextX < p.x + p.width
+                ) {
+                    nextX = p.x + p.width;
+                    player.dx = 0;
+                }
+            }
+            player.x = nextX;
+
+            // Додаємо гравітацію
+            player.dy += gravity;
+            nextY = player.y + player.dy;
+            player.onGround = false;
+
+            // Перевірка вертикальних зіткнень
+            for (const p of platforms) {
+                // Зіткнення знизу (приземлення)
+                if (
+                    player.x + player.width > p.x &&
+                    player.x < p.x + p.width &&
+                    player.y + player.height <= p.y &&
+                    nextY + player.height > p.y
+                ) {
+                    nextY = p.y - player.height;
+                    player.dy = 0;
+                    player.onGround = true;
+                }
+                // Зіткнення зверху (удар головою)
+                if (
+                    player.x + player.width > p.x &&
+                    player.x < p.x + p.width &&
+                    player.y >= p.y + p.height &&
+                    nextY < p.y + p.height
+                ) {
+                    nextY = p.y + p.height;
+                    player.dy = 0;
+                }
+            }
+            player.y = nextY;
+
+            // Обмеження по краях екрану
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawPlatforms();
+            updatePlayer();
+            drawPlayer();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
