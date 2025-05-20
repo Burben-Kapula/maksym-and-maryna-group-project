@@ -3,167 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Student Portfolio</title>
     <style>
         body {
             margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #111;
+            color: #f7f7f7;
+            min-height: 100vh;
+            position: relative;
             overflow: hidden;
         }
-        canvas {
-            background: #222;
-            display: block;
+        #rainCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
         }
-        canvas#gameCanvas {
-            background-color: rgba(71, 67, 70, 0.52);
+        .sound-btn, .direction-btn {
+            position: fixed;
+            top: 20px;
+            z-index: 11;
+            background: #222;
+            color: #f7f7f7;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sound-btn {
+            right: 20px;
+        }
+        .direction-btn {
+            right: 180px;
+        }
+        .sound-btn.active, .direction-btn.active {
+            background: #2e7dff;
+            color: #fff;
+        }
+        header {
+            padding: 32px 0 16px 0;
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            background: transparent;
+            border-bottom: 1px solid #222;
+            z-index: 1;
+            position: relative;
+        }
+        .contact-btn {
+            display: block;
+            margin: 24px auto 0 auto;
+            padding: 10px 32px;
+            background: #222;
+            color: #f7f7f7;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 2;
+            position: relative;
+        }
+        .contact-btn:hover {
+            background: #444;
+        }
+        .modal-bg {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0; top: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-bg.active {
+            display: flex;
+        }
+        .modal {
+            background: #181818;
+            color: #f7f7f7;
+            border-radius: 10px;
+            padding: 32px 24px 24px 24px;
+            min-width: 300px;
+            max-width: 90vw;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+            position: relative;
+        }
+        .modal h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+        }
+        main {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 16px;
+            position: relative;
+            z-index: 1;
+        }
+        section {
+            background: rgba(20, 20, 20, 0.92);
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+            margin-bottom: 32px;
+            padding: 32px 24px;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+            color: #f7f7f7;
+        }
+        ul.projects {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul.projects li {
+            padding: 12px 0;
+            border-bottom: 1px solid #222;
+        }
+        ul.projects li:last-child {
+            border-bottom: none;
+        }
+        .bio {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #ccc;
+        }
+        a {
+            color: #2e7dff;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            main {
+                margin: 16px;
+                padding: 0 4px;
+            }
+            section {
+                padding: 18px 8px;
+            }
+            .sound-btn, .direction-btn {
+                top: 10px;
+                padding: 8px 12px;
+                font-size: 0.95rem;
+            }
+            .direction-btn {
+                right: 120px;
+            }
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-
+    <canvas id="rainCanvas"></canvas>
+    <button class="sound-btn" id="soundBtn">Rain Sound: Off</button>
+    <button class="direction-btn" id="directionBtn">Rain: Down</button>
+    <header>
+        My Portfolio
+    </header>
+    <main>
+        <section>
+            <h2>Biography</h2>
+            <div class="bio">
+                I am a student interested in modern technologies, programming, and web development. I love learning new things and working on interesting challenges.
+            </div>
+        </section>
+        <section>
+            <h2>My Projects</h2>
+            <ul class="projects">
+                <li>
+                    <strong><a href="https://github.com/Burben-Kapula/CASINO">"Hedelmäpeli" or Casino</a></strong><br>
+                    A simple casino game where you can play with virtual money. The game includes a slot machine and a roulette.
+                </li>
+                <li>
+                    <strong><a href="https://github.com/Burben-Kapula/Sikanoppapeli">"Sikanoppapeli" or Dice game</a></strong><br>
+                    Small dice roll game for 2 or 4 players.
+                </li>
+                <!-- Add your projects here -->
+            </ul>
+        </section>
+        <button class="contact-btn" id="openContact">Contact Me</button>
+    </main>
+    <div class="modal-bg" id="modalBg">
+        <div class="modal">
+            <button class="close" type="button" id="closeModal" title="Close">&times;</button>
+            <h3>Contact Information</h3>
+            <div style="margin-bottom: 12px;">
+                <strong>Name:</strong> Maksym Kapula
+            </div>
+            <div style="margin-bottom: 12px;">
+                <strong>Phone:</strong> +358407365886
+            </div>
+            <div>
+                <strong>Email:</strong> <a href="mailto:maksym.kapula@gmail.com" style="color:#2e7dff;">maksym.kapula@gmail.com</a>
+            </div>
+        </div>
+    </div>
+    <audio id="rainAudio" loop>
+        <source src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa8c82.mp3" type="audio/mpeg">
+        <!-- Free atmospheric rain sound from Pixabay -->
+    </audio>
+    <audio id="thunderAudio" preload="auto">
+        <source src="https://cdn.pixabay.com/audio/2022/10/16/audio_12b7e2e2e7.mp3" type="audio/mpeg">
+        <!-- Free thunder sound from Pixabay -->
+    </audio>
     <script>
-        const canvas = document.getElementById('gameCanvas');
+        // --- Rain and Thunder Animation ---
+        const canvas = document.getElementById('rainCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 1920;
-        canvas.height = 1080;
+        let raindrops = [];
+        let rainDirection = 0; // 0 = down, 1 = right, 2 = left
 
-        canvas.style.backgroundColor = 'rgba(71, 67, 70, 0.52)';
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            raindrops = []; // reset drops on resize for correct fill
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-        let gravity = 0.5;
-        let jumpPower = -12;
-        let charge = 0;
-        let maxCharge = 5;
-        let charging = false;
-        const player = {
-            x: 100,
-            y: 400,
-            width: 30,
-            height: 30,
-            dx: 0,
-            dy: 0,
-            onGround: false
+        function createRaindrop() {
+            let angle = 0;
+            if (rainDirection === 1) angle = Math.PI / 6; // right
+            if (rainDirection === 2) angle = -Math.PI / 6; // left
+            const speed = 4 + Math.random() * 4;
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * -canvas.height,
+                length: 12 + Math.random() * 18,
+                speed: speed,
+                opacity: 0.3 + Math.random() * 0.4,
+                width: 1 + Math.random() * 1.5,
+                angle: angle
+            };
+        }
+
+        function spawnRain() {
+            while (raindrops.length < Math.floor(canvas.width / 2)) {
+                raindrops.push(createRaindrop());
+            }
+        }
+
+        function updateRain() {
+            for (let drop of raindrops) {
+                drop.x += Math.sin(drop.angle) * drop.speed;
+                drop.y += Math.cos(drop.angle) * drop.speed;
+                if (
+                    drop.y > canvas.height + 20 ||
+                    drop.x < -20 ||
+                    drop.x > canvas.width + 20
+                ) {
+                    // Respawn at top with new direction
+                    let angle = 0;
+                    if (rainDirection === 1) angle = Math.PI / 6;
+                    if (rainDirection === 2) angle = -Math.PI / 6;
+                    drop.x = Math.random() * canvas.width;
+                    drop.y = Math.random() * -20;
+                    drop.length = 12 + Math.random() * 18;
+                    drop.speed = 4 + Math.random() * 4;
+                    drop.opacity = 0.3 + Math.random() * 0.4;
+                    drop.width = 1 + Math.random() * 1.5;
+                    drop.angle = angle;
+                }
+            }
+        }
+
+        function drawRain() {
+            ctx.save();
+            ctx.strokeStyle = "rgba(180,200,255,0.5)";
+            ctx.lineCap = "round";
+            for (let drop of raindrops) {
+                ctx.globalAlpha = drop.opacity;
+                ctx.lineWidth = drop.width;
+                ctx.beginPath();
+                ctx.moveTo(drop.x, drop.y);
+                ctx.lineTo(
+                    drop.x + Math.sin(drop.angle) * drop.length,
+                    drop.y + Math.cos(drop.angle) * drop.length
+                );
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // --- Lightning effect (instead of yellow flashes) ---
+        const thunderAudio = document.getElementById('thunderAudio');
+        let lightnings = [];
+        let thunderTimer = 0;
+
+        function spawnLightning() {
+            const startX = Math.random() * canvas.width;
+            const segments = 15 + Math.floor(Math.random() * 10);
+            const points = [];
+            let x = startX;
+            let y = 0;
+            points.push({x, y});
+            for (let i = 1; i < segments; i++) {
+                x += (Math.random() - 0.5) * 40; // horizontal randomness
+                y += canvas.height / segments + Math.random() * 10;
+                points.push({x, y});
+            }
+            lightnings.push({
+                points,
+                start: performance.now(),
+                duration: 180 + Math.random() * 120 // ms
+            });
+            // Play thunder sound with some probability
+            if (Math.random() < 0.7) {
+                setTimeout(() => {
+                    thunderAudio.currentTime = 0;
+                    thunderAudio.volume = 0.5 + Math.random() * 0.5;
+                    thunderAudio.play();
+                }, 200 + Math.random() * 500); // delay for realism
+            }
+        }
+
+        function drawLightnings(now) {
+            for (let i = lightnings.length - 1; i >= 0; i--) {
+                const l = lightnings[i];
+                const elapsed = now - l.start;
+                if (elapsed > l.duration) {
+                    lightnings.splice(i, 1);
+                    continue;
+                }
+                // Animation: fade out
+                const alpha = 0.8 * (1 - elapsed / l.duration);
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(255,255,255,0.8)';
+                ctx.shadowBlur = 18;
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = 'rgba(255,255,255,1)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(l.points[0].x, l.points[0].y);
+                for (let j = 1; j < l.points.length; j++) {
+                    ctx.lineTo(l.points[j].x, l.points[j].y);
+                }
+                ctx.stroke();
+
+                // Draw a blue glow
+                ctx.globalAlpha = alpha * 0.5;
+                ctx.shadowColor = 'rgba(100,180,255,0.7)';
+                ctx.shadowBlur = 32;
+                ctx.strokeStyle = 'rgba(120,180,255,0.5)';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.moveTo(l.points[0].x, l.points[0].y);
+                for (let j = 1; j < l.points.length; j++) {
+                    ctx.lineTo(l.points[j].x, l.points[j].y);
+                }
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        // --- Main animation loop ---
+        function mainLoop(now) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spawnRain();
+            updateRain();
+            drawRain();
+            drawLightnings(now);
+
+            // Thunder logic: spawn lightning at random intervals
+            if (thunderTimer <= 0 && Math.random() < 0.008) {
+                spawnLightning();
+                thunderTimer = 30 + Math.random() * 60; // frames to next thunder
+            } else if (thunderTimer > 0) {
+                thunderTimer--;
+            }
+
+            requestAnimationFrame(mainLoop);
+        }
+        mainLoop();
+
+        // --- Rain sound logic ---
+        const rainAudio = document.getElementById('rainAudio');
+        const soundBtn = document.getElementById('soundBtn');
+        let soundOn = false;
+
+        soundBtn.onclick = function() {
+            if (!soundOn) {
+                rainAudio.volume = 0.5;
+                rainAudio.play();
+                soundBtn.textContent = "Rain Sound: On";
+                soundBtn.classList.add("active");
+                soundOn = true;
+            } else {
+                rainAudio.pause();
+                soundBtn.textContent = "Rain Sound: Off";
+                soundBtn.classList.remove("active");
+                soundOn = false;
+            }
         };
 
-        // Масив платформ і стінок
-        const platforms = [
-            { x: 0, y: 900, width: 18000, height: 100 }, // земля
-            { x: 0, y: 0, width: 50, height: 6000 },     // ліва стінка
-            { x: 300, y: 800, width: 300, height: 300 }, // платформа
-            // Додавайте нові платформи тут за потреби
-        ];
-
-        function drawPlayer() {
-            ctx.fillStyle = 'lime';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-        }
-
-        function drawPlatforms() {
-            ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-            for (const p of platforms) {
-                ctx.fillRect(p.x, p.y, p.width, p.height);
-            }
-        }
-
-        const keys = {};
-
-        window.addEventListener('keydown', function(e) {
-            keys[e.code] = true;
-            // Стрибок (пробіл)
-            if ((e.code === 'Space') && player.onGround) {
-                player.dy = jumpPower;
-                player.onGround = false;
-            }
-        });
-
-        window.addEventListener('keyup', function(e) {
-            keys[e.code] = false;
-        });
-
-        function updatePlayer() {
-            // Визначаємо швидкість по X
-            if (keys['ArrowLeft'] || keys['KeyA']) {
-                player.dx = -5;
-            } else if (keys['ArrowRight'] || keys['KeyD']) {
-                player.dx = 5;
+        // --- Rain direction logic ---
+        const directionBtn = document.getElementById('directionBtn');
+        directionBtn.onclick = function() {
+            rainDirection = (rainDirection + 1) % 3;
+            if (rainDirection === 0) {
+                directionBtn.textContent = "Rain: Down";
+            } else if (rainDirection === 1) {
+                directionBtn.textContent = "Rain: Right";
             } else {
-                player.dx = 0;
+                directionBtn.textContent = "Rain: Left";
             }
-
-            // Горизонтальний рух з перевіркою зіткнень
-            let nextX = player.x + player.dx;
-            let nextY = player.y;
-
-            for (const p of platforms) {
-                // Зіткнення справа
-                if (
-                    player.y + player.height > p.y &&
-                    player.y < p.y + p.height &&
-                    player.x + player.width <= p.x &&
-                    nextX + player.width > p.x
-                ) {
-                    nextX = p.x - player.width;
-                    player.dx = 0;
-                }
-                // Зіткнення зліва
-                if (
-                    player.y + player.height > p.y &&
-                    player.y < p.y + p.height &&
-                    player.x >= p.x + p.width &&
-                    nextX < p.x + p.width
-                ) {
-                    nextX = p.x + p.width;
-                    player.dx = 0;
-                }
+            // Update all drops' angle
+            let angle = 0;
+            if (rainDirection === 1) angle = Math.PI / 6;
+            if (rainDirection === 2) angle = -Math.PI / 6;
+            for (let drop of raindrops) {
+                drop.angle = angle;
             }
-            player.x = nextX;
+        };
 
-            // Додаємо гравітацію
-            player.dy += gravity;
-            nextY = player.y + player.dy;
-            player.onGround = false;
+        // --- Contact modal logic ---
+        const openBtn = document.getElementById('openContact');
+        const modalBg = document.getElementById('modalBg');
+        const closeBtn = document.getElementById('closeModal');
 
-            // Перевірка вертикальних зіткнень
-            for (const p of platforms) {
-                // Зіткнення знизу (приземлення)
-                if (
-                    player.x + player.width > p.x &&
-                    player.x < p.x + p.width &&
-                    player.y + player.height <= p.y &&
-                    nextY + player.height > p.y
-                ) {
-                    nextY = p.y - player.height;
-                    player.dy = 0;
-                    player.onGround = true;
-                }
-                // Зіткнення зверху (удар головою)
-                if (
-                    player.x + player.width > p.x &&
-                    player.x < p.x + p.width &&
-                    player.y >= p.y + p.height &&
-                    nextY < p.y + p.height
-                ) {
-                    nextY = p.y + p.height;
-                    player.dy = 0;
-                }
-            }
-            player.y = nextY;
-
-            // Обмеження по краях екрану
-            if (player.x < 0) player.x = 0;
-            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
-        }
-
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawPlatforms();
-            updatePlayer();
-            drawPlayer();
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        gameLoop();
+        openBtn.onclick = () => {
+            modalBg.classList.add('active');
+        };
+        closeBtn.onclick = () => {
+            modalBg.classList.remove('active');
+        };
+        modalBg.onclick = (e) => {
+            if (e.target === modalBg) modalBg.classList.remove('active');
+        };
+        
     </script>
 </body>
 </html>
